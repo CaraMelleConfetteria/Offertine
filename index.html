@@ -658,7 +658,7 @@ function render() {
 
   let html = '';
   if (alerts.length) {
-    html += `<div class="alert-bar"><img src="./offerta.gif" style="width:48px;height:48px;flex-shrink:0"> ${alerts.length} prodotto${alerts.length>1?'i':''} sotto il prezzo target!</div>`;
+    html += `<div class="alert-bar"><img src="./offerta.gif" style="width:48px;height:48px;flex-shrink:0"> ${alerts.length} prodotto${alerts.length>1?'i':''} ${alerts.length>1?'sono scesi':'è sceso'} di prezzo!</div>`;
   }
 
   products.forEach(p => {
