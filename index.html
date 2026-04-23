@@ -378,7 +378,7 @@
 
   <div class="sec-title">Notifiche Push</div>
   <div class="notif-card" id="notif-card">
-    <div class="notif-ico" id="notif-ico"><img src="./notifica.gif" style="width:36px;height:36px;"></div>
+    <div class="notif-ico" id="notif-ico"><img id="notif-img" src="./Ring.svg" style="width:36px;height:36px;"></div>
     <div class="notif-info">
       <h4 id="notif-title">Notifiche non attive</h4>
       <p id="notif-desc">Attiva le notifiche per ricevere alert sul telefono</p>
@@ -762,8 +762,36 @@ function updatePushUI() {
     title.textContent = 'Notifiche attive';
     desc.textContent = 'Riceverai notifiche push quando il prezzo scende';
     card.classList.add('active-notif');
-    btn.textContent = 'Rinnova sottoscrizione';
-    btn.className = 'btn btn-secondary';
+    document.getElementById('notif-img').src = './notifica.gif';
+    btn.textContent = 'Disattiva notifiche';
+    btn.className = 'btn btn-danger';
+    btn.style.display = '';
+    btn.onclick = disablePush;
+    return;
+  }
+}
+
+async function disablePush() {
+  if (!confirm('Disattivare le notifiche push?')) return;
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    const sub = await reg.pushManager.getSubscription();
+    if (sub) await sub.unsubscribe();
+
+    // Rimuovi dal Gist
+    const subJson = JSON.parse(LS.sub);
+    const cur = await ghReq('GET', '/gists/' + LS.gistId);
+    let subs = [];
+    if (cur.files?.['subscriptions.json']?.content)
+      subs = JSON.parse(cur.files['subscriptions.json'].content);
+    subs = subs.filter(s => s.endpoint !== subJson.endpoint);
+    await saveToGist(products, subs);
+
+    LS.sub = '';
+    toast('🔕 Notifiche disattivate');
+    updatePushUI();
+  } catch(e) {
+    toast('❌ ' + e.message);
   }
 }
 
@@ -795,7 +823,7 @@ async function enablePush() {
     subs.push(subJson);
     await saveToGist(products, subs);
 
-    toast('🔔 Notifiche push attivate!');
+    toast('Notifiche push attivate!');
     updatePushUI();
   } catch(e) {
     if (e.name === 'NotAllowedError') toast('❌ Permesso negato');
