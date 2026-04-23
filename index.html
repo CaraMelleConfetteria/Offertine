@@ -686,25 +686,23 @@ function render() {
     const cls = !has ? 'none' : hit ? 'hit' : 'miss';
     html += `
     <div class="card${hit?' hit':''}">
-      <div class="card-top">
-        <div class="card-name">${esc(p.name)}</div>
-        <div class="card-top-right">
+      <div style="display:flex; gap:12px; justify-content:space-between;">
+        <div style="flex:1; min-width:0;">
+          <div class="card-name" style="margin-bottom:10px">${esc(p.name)}</div>
+          <div class="price-big ${cls}">${fmtPrice(p.current_price)}</div>
+          <div class="ts" style="margin-top:6px">Aggiornato ${fmtAge(p.last_checked)}</div>
+          <a class="prod-link" href="${esc(p.url)}" target="_blank" style="display:inline-block; margin-top:10px">Apri pagina prodotto →</a>
+        </div>
+        <div style="display:flex; flex-direction:column; align-items:flex-end; justify-content:space-between; flex-shrink:0;">
           <span class="badge ${p.platform}">${p.platform==='amazon'?'Amazon':'AliExpress'}</span>
-          <div class="price-target">Target<br><strong>${fmtPrice(p.target_price)}</strong></div>
+          <div class="price-target" style="text-align:right">Target<br><strong>${fmtPrice(p.target_price)}</strong></div>
           <button class="del-btn" onclick="delProduct('${p.id}')" title="Rimuovi">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
               <path d="M10 11v6M14 11v6M9 6V4h6v2"/>
             </svg>
           </button>
         </div>
-      </div>
-      <div class="price-big ${cls}">${fmtPrice(p.current_price)}</div>
-      <div class="card-footer">
-        <span class="ts">Aggiornato ${fmtAge(p.last_checked)}</span>
-      </div>
-      <div style="margin-top:8px">
-        <a class="prod-link" href="${esc(p.url)}" target="_blank">Apri pagina prodotto →</a>
       </div>
     </div>`;
   });
