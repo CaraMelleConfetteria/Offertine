@@ -503,7 +503,6 @@ async function completeSetup() {
 
 // ── GitHub Gist API ────────────────────────────────────────────────────────
 async function ghReq(method, path, body) {
-  // Aggiungi cache-busting sui GET per evitare dati obsoleti
   const url = 'https://api.github.com' + path + (method === 'GET' ? '?_=' + Date.now() : '');
   const r = await fetch(url, {
     method,
@@ -511,7 +510,6 @@ async function ghReq(method, path, body) {
       'Authorization': 'token ' + LS.token,
       'Accept': 'application/vnd.github.v3+json',
       'Content-Type': 'application/json',
-      'Cache-Control': 'no-cache',
     },
     body: body ? JSON.stringify(body) : undefined
   });
