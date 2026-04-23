@@ -742,9 +742,21 @@ function updatePushUI() {
     btn.textContent = 'Disattiva notifiche';
     btn.className = 'btn btn-danger';
     btn.style.display = '';
+    btn.disabled = false;
     btn.onclick = disablePush;
     return;
   }
+
+  // Default: notifiche non attive
+  title.textContent = 'Notifiche non attive';
+  desc.textContent = 'Attiva le notifiche per ricevere alert sul telefono';
+  card.classList.remove('active-notif');
+  document.getElementById('notif-img').src = './Ring.svg';
+  btn.textContent = 'Attiva Notifiche Push';
+  btn.className = 'btn btn-primary';
+  btn.style.display = '';
+  btn.disabled = false;
+  btn.onclick = enablePush;
 }
 
 async function disablePush() {
