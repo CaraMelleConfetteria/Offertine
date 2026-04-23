@@ -140,41 +140,60 @@ def get_amazon_price(url):
 # ── AliExpress scraping ──────────────────────────────────────────────────────
 def get_aliexpress_price(url):
     try:
+        # Estrai item ID dall'URL
+        match = re.search(r'/item/(\d+)', url)
+        if not match:
+            print('  ⚠️  AliExpress: item ID non trovato nell\'URL')
+            return None
+        item_id = match.group(1)
+
+        # Prova prima con render JS (più affidabile per AliExpress)
         r = fetch_url(url, render_js=True)
         text = r.text
-        
-        # Prova a estrarre il JSON embeddato nella pagina
+
+        # Pattern per estrarre il prezzo dal JSON embeddato
         patterns = [
-            r'"minActivityAmount"\s*:\s*(\d+\.?\d*)',
-            r'"minAmount"\s*:\s*(\d+\.?\d*)',
-            r'"salePrice"\s*:\s*\{\s*"value"\s*:\s*"?(\d+\.?\d*)',
-            r'"discountedPrice"\s*:\s*"?(\d+\.?\d*)',
-            r'"price"\s*:\s*\{\s*"value"\s*:\s*"?(\d+\.?\d*)',
-            r'"currentPrice"\s*:\s*(\d+\.?\d*)',
-            r'promotionPrice["\s:]+(\d+\.?\d*)',
-            r'"actPrice"\s*:\s*(\d+\.?\d*)',
+            r'"minActivityAmount"\s*:\s*"?([\d.]+)"?',
+            r'"minAmount"\s*:\s*"?([\d.]+)"?',
+            r'"actPrice"\s*:\s*"?([\d.]+)"?',
+            r'"salePrice"\s*:\s*\{[^}]*"value"\s*:\s*"?([\d.]+)"?',
+            r'"currentPrice"\s*:\s*"?([\d.]+)"?',
+            r'"price"\s*:\s*\{[^}]*"value"\s*:\s*"?([\d.]+)"?',
+            r'promotionPrice["\s:]+(["\']?)([\d.]+)\1',
+            r'"discountedPrice"\s*:\s*"?([\d.]+)"?',
+            # Pattern per prezzi in formato "€X,XX"
+            r'class="[^"]*price[^"]*"[^>]*>\s*[€$]?\s*([\d,]+(?:\.\d+)?)',
         ]
-        
+
         for pat in patterns:
-            m = re.search(pat, text)
+            m = re.search(pat, text, re.IGNORECASE)
             if m:
-                v = float(m.group(1))
-                if 0.01 < v < 100000:
-                    return v
-        
+                # Alcuni pattern hanno 2 gruppi
+                val_str = m.group(2) if m.lastindex and m.lastindex >= 2 else m.group(1)
+                try:
+                    v = float(val_str.replace(',', '.'))
+                    if 0.01 < v < 100000:
+                        print(f'  → Pattern "{pat[:30]}..." → €{v}')
+                        return v
+                except ValueError:
+                    continue
+
         # Fallback BeautifulSoup
         soup = BeautifulSoup(text, 'lxml')
         for sel in [
             'span.uniform-banner-box-price',
+            'div.uniform-banner-box-price',
             '.product-price-value',
-            'span[class*="Price"]',
+            'span[class*="Price_price"]',
+            'div[class*="price--"]',
+            'span[class*="price"]',
         ]:
             el = soup.select_one(sel)
             if el:
                 price = parse_price(el.get_text())
                 if price and price > 0:
                     return price
-        
+
         print('  ⚠️  AliExpress: prezzo non trovato')
         return None
     except Exception as e:
