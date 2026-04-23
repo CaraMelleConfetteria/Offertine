@@ -68,14 +68,26 @@
     .screen.active { display: block; }
 
     /* ── Bottom nav ── */
-    .bnav {
-      position: fixed; bottom: 0; right: 0;
-      display: flex; flex-direction: column; align-items: center;
-      padding: 0 20px calc(16px + var(--sab)) 0;
-      z-index: 100; gap: 8px; pointer-events: none;
+    .bnav { display: none; } /* nascosto di default, mostrato solo su home */
+    .bnav.visible { display: block; }
+
+    /* + button — tondo, centrato, nel flusso della pagina */
+    .fab {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--accent); border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 14px rgba(249,115,22,.3);
+      transition: opacity .15s;
+      margin: 16px auto 8px;
     }
-    .bnav > * { pointer-events: all; }
-    .bnav-icons { display: flex; gap: 6px; }
+    .fab:active { opacity: .85; }
+    .fab svg { width: 22px; height: 22px; stroke: #fff; stroke-width: 2.5; }
+
+    /* home + settings — basso destra */
+    .bnav-icons {
+      position: fixed; bottom: calc(20px + var(--sab)); right: 20px;
+      display: flex; gap: 6px; z-index: 100;
+    }
     .nbtn {
       width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -86,15 +98,6 @@
     }
     .nbtn.on { color: var(--accent); border-color: var(--accent); }
     .nbtn svg { width: 20px; height: 20px; stroke-width: 1.8; }
-    .fab {
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--accent); border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px rgba(249,115,22,.4);
-      transition: transform .15s, box-shadow .15s;
-    }
-    .fab:active { transform: scale(.95); }
-    .fab svg { width: 24px; height: 24px; stroke: #fff; stroke-width: 2.5; }
 
     /* ── Cards ── */
     .card {
@@ -330,6 +333,9 @@
 <!-- ── Screen: Home ── -->
 <div class="screen active" id="screen-home">
   <div id="prod-list"></div>
+  <button class="fab" id="nav-add" onclick="goto('add')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
 </div>
 
 <!-- ── Screen: Add ── -->
@@ -409,19 +415,14 @@
 </div>
 
 <!-- ── Bottom nav ── -->
-<nav class="bnav">
-  <button class="fab" id="nav-add" onclick="goto('add')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+<div class="bnav-icons" id="bnav-icons">
+  <button class="nbtn on" id="nav-home" onclick="goto('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
   </button>
-  <div class="bnav-icons">
-    <button class="nbtn on" id="nav-home" onclick="goto('home')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-    </button>
-    <button class="nbtn" id="nav-settings" onclick="goto('settings')">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
-    </button>
-  </div>
-</nav>
+  <button class="nbtn" id="nav-settings" onclick="goto('settings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+  </button>
+</div>
 
 <div id="toast"></div>
 
@@ -484,7 +485,10 @@ function toast(msg, ms = 3200) {
 function goto(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
-  // Update nav icons (only home and settings have nav buttons)
+  // Mostra nav solo sulla schermata prodotti
+  const showNav = name === 'home';
+  document.getElementById('bnav-icons').style.display = showNav ? 'flex' : 'none';
+  // Aggiorna icone attive
   document.querySelectorAll('.nbtn').forEach(b => b.classList.remove('on'));
   const navBtn = document.getElementById('nav-' + name);
   if (navBtn) navBtn.classList.add('on');
@@ -515,6 +519,8 @@ async function completeSetup() {
     if (!LS.gistId) await createGist();
     await loadFromGist();
     document.getElementById('setup-overlay').classList.add('hidden');
+    document.getElementById('nav-add').style.display = 'flex';
+    document.getElementById('bnav-icons').style.display = 'flex';
     render();
     toast('✅ Configurazione completata!');
   } catch(e) {
@@ -802,6 +808,9 @@ async function enablePush() {
 
 // ── Boot ───────────────────────────────────────────────────────────────────
 async function boot() {
+  // Nascondi nav finché non configurato
+  document.getElementById('bnav-icons').style.display = 'none';
+
   // Register SW
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(console.warn);
@@ -810,6 +819,8 @@ async function boot() {
   // Check if already configured
   if (LS.token && LS.vapid) {
     document.getElementById('setup-overlay').classList.add('hidden');
+    document.getElementById('nav-add').style.display = 'flex';
+    document.getElementById('bnav-icons').style.display = 'flex';
     try {
       await loadFromGist();
     } catch(e) { toast('⚠️ ' + e.message); }
