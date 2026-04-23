@@ -110,8 +110,8 @@
       content: ''; position: absolute; left: 0; top: 0;
       width: 3px; height: 100%; background: var(--green);
     }
-    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 14px; }
-    .card-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; flex-shrink: 0; }
+    .card-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; }
+    .card-top-right { display: flex; flex-direction: column; align-items: flex-end; gap: 6px; flex-shrink: 0; }
     .card-name { font-size: 14px; font-weight: 600; line-height: 1.35; flex: 1; }
     .badge {
       font-size: 9px; font-weight: 800; padding: 3px 8px; border-radius: 20px;
@@ -690,6 +690,7 @@ function render() {
         <div class="card-name">${esc(p.name)}</div>
         <div class="card-top-right">
           <span class="badge ${p.platform}">${p.platform==='amazon'?'Amazon':'AliExpress'}</span>
+          <div class="price-target">Target<br><strong>${fmtPrice(p.target_price)}</strong></div>
           <button class="del-btn" onclick="delProduct('${p.id}')" title="Rimuovi">
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
@@ -698,12 +699,11 @@ function render() {
           </button>
         </div>
       </div>
-      <div class="price-row">
-        <div class="price-big ${cls}">${fmtPrice(p.current_price)}</div>
-        <div class="price-target">Target<br><strong>${fmtPrice(p.target_price)}</strong></div>
-      </div>
+      <div class="price-big ${cls}">${fmtPrice(p.current_price)}</div>
       <div class="card-footer">
         <span class="ts">Aggiornato ${fmtAge(p.last_checked)}</span>
+      </div>
+      <div style="margin-top:8px">
         <a class="prod-link" href="${esc(p.url)}" target="_blank">Apri pagina prodotto →</a>
       </div>
     </div>`;
