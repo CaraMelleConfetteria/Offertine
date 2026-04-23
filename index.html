@@ -73,10 +73,9 @@
 
     /* + button — tondo, centrato, nel flusso della pagina */
     .fab {
-      width: 52px; height: 52px; border-radius: 0;
+      width: 52px; height: 52px; border-radius: 50%;
       background: var(--accent); border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 14px rgba(249,115,22,.3);
       transition: opacity .15s;
       margin: 28px auto 8px;
     }
@@ -376,7 +375,7 @@
 
   <div class="sec-title">Notifiche Push</div>
   <div class="notif-card" id="notif-card">
-    <div class="notif-ico" id="notif-ico">🔔</div>
+    <div class="notif-ico" id="notif-ico"><img src="./notifica.gif" style="width:36px;height:36px;"></div>
     <div class="notif-info">
       <h4 id="notif-title">Notifiche non attive</h4>
       <p id="notif-desc">Attiva le notifiche per ricevere alert sul telefono</p>
@@ -748,18 +747,18 @@ function updatePushUI() {
   const btn   = document.getElementById('notif-btn');
 
   if (!('Notification' in window) || !('serviceWorker' in navigator)) {
-    ico.textContent = '🚫'; title.textContent = 'Non supportato';
+    title.textContent = 'Non supportato';
     desc.textContent = 'Browser non compatibile'; btn.disabled = true; return;
   }
 
   if (Notification.permission === 'denied') {
-    ico.textContent = '🚫'; title.textContent = 'Notifiche bloccate';
+    title.textContent = 'Notifiche bloccate';
     desc.textContent = 'Abilita le notifiche nelle impostazioni del browser';
     btn.disabled = true; return;
   }
 
   if (Notification.permission === 'granted' && LS.sub) {
-    ico.textContent = '✅'; title.textContent = 'Notifiche attive';
+    title.textContent = 'Notifiche attive';
     desc.textContent = 'Riceverai notifiche push quando il prezzo scende';
     card.classList.add('active-notif');
     btn.textContent = 'Rinnova sottoscrizione';
