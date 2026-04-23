@@ -90,6 +90,11 @@
       position: fixed; bottom: 30px; right: 20px;
       display: flex; gap: 6px; z-index: 100;
     }
+    @supports (-webkit-touch-callout: none) {
+      .bnav-icons {
+        bottom: calc(30px + env(safe-area-inset-bottom));
+      }
+    }
     .nbtn {
       width: 44px; height: 44px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
@@ -658,7 +663,7 @@ function render() {
 
   let html = '';
   if (alerts.length) {
-    html += `<div class="alert-bar"><img src="./offerta.gif" style="width:48px;height:48px;flex-shrink:0"> ${alerts.length} prodotto${alerts.length>1?'i':''} ${alerts.length>1?'sono scesi':'è sceso'} di prezzo!</div>`;
+    html += `<div class="alert-bar"><img src="./offerta.gif" style="width:48px;height:48px;flex-shrink:0"> ${alerts.length} prodotto${alerts.length>1?'i':''} sotto il prezzo target!</div>`;
   }
 
   products.forEach(p => {
