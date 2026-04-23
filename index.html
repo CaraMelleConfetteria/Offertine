@@ -30,6 +30,9 @@
       --sat: env(safe-area-inset-top, 0px);
     }
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    input[type=number] { -moz-appearance: textfield; }
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
     html, body { height: 100%; }
     body {
       font-family: 'Raleway', -apple-system, BlinkMacSystemFont, sans-serif;
