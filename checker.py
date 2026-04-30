@@ -53,6 +53,16 @@ def fetch_url(url, render_js=False):
         if render_js:
             params['render'] = 'true'
         r = requests.get('http://api.scraperapi.com', params=params, timeout=60)
+        # Se ScraperAPI fallisce, prova diretto
+        if r.status_code >= 500:
+            print(f'  ⚠️  ScraperAPI errore {r.status_code}, provo diretto...')
+            headers = {
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+                'Accept-Language': 'it-IT,it;q=0.9,en;q=0.8',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+                'Referer': 'https://www.google.com/',
+            }
+            r = requests.get(url, headers=headers, timeout=20)
     else:
         headers = {
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
