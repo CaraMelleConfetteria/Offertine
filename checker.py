@@ -161,47 +161,54 @@ def get_amazon_price(url):
 # ── AliExpress scraping ──────────────────────────────────────────────────────
 def get_aliexpress_price(url):
     try:
+        from urllib.parse import unquote
         match = re.search(r'/item/(\d+)', url)
         if not match:
             print('  ⚠️  AliExpress: item ID non trovato nell\'URL')
             return None
         item_id = match.group(1)
 
-        # Prova con render JS
-        r = fetch_url(url, render_js=True)
+        # Usa URL pulito in inglese — meno redirect
+        clean_url = f'https://www.aliexpress.com/item/{item_id}.html'
+        
+        r = fetch_url(clean_url, render_js=True)
         text = r.text
         
-        print(f'  🔍 HTTP status: {r.status_code}, HTML len: {len(text)}')
+        # Decodifica URL encoding se presente
+        if '%22' in text:
+            text_decoded = unquote(text)
+        else:
+            text_decoded = text
         
-        # Debug: salva snippet HTML con "price"
-        price_snippets = re.findall(r'.{0,50}[Pp]rice.{0,80}', text)[:5]
-        for s in price_snippets:
-            print(f'  📄 {s[:120]}')
+        print(f'  🔍 HTTP status: {r.status_code}, HTML len: {len(text)}')
 
-        # Pattern per estrarre il prezzo dal JSON embeddato
+        # Pattern sul testo decodificato
         patterns = [
+            r'"originalPrice"\s*:\s*\{[^}]*"value"\s*:\s*"?([\d.]+)"?',
+            r'"salePrice"\s*:\s*\{[^}]*"value"\s*:\s*"?([\d.]+)"?',
             r'"minActivityAmount"\s*:\s*"?([\d.]+)"?',
             r'"minAmount"\s*:\s*"?([\d.]+)"?',
             r'"actPrice"\s*:\s*"?([\d.]+)"?',
-            r'"salePrice"\s*:\s*\{[^}]*"value"\s*:\s*"?([\d.]+)"?',
             r'"currentPrice"\s*:\s*"?([\d.]+)"?',
-            r'"price"\s*:\s*\{[^}]*"value"\s*:\s*"?([\d.]+)"?',
+            r'"price"\s*:\s*"([\d.]+)"',
             r'promotionPrice["\s:]+(["\']?)([\d.]+)\1',
             r'"discountedPrice"\s*:\s*"?([\d.]+)"?',
-            r'class="[^"]*price[^"]*"[^>]*>\s*[€$]?\s*([\d,]+(?:\.\d+)?)',
+            r'"formatedPrice"\s*:\s*"[€$]?\s*([\d,]+\.?\d*)"',
+            r'"formatedActivityPrice"\s*:\s*"[€$]?\s*([\d,]+\.?\d*)"',
         ]
 
-        for pat in patterns:
-            m = re.search(pat, text, re.IGNORECASE)
-            if m:
-                val_str = m.group(2) if m.lastindex and m.lastindex >= 2 else m.group(1)
-                try:
-                    v = float(val_str.replace(',', '.'))
-                    if 0.01 < v < 100000:
-                        print(f'  → Pattern "{pat[:30]}..." → €{v}')
-                        return v
-                except ValueError:
-                    continue
+        for txt in [text_decoded, text]:
+            for pat in patterns:
+                m = re.search(pat, txt, re.IGNORECASE)
+                if m:
+                    val_str = m.group(2) if m.lastindex and m.lastindex >= 2 else m.group(1)
+                    try:
+                        v = float(val_str.replace(',', '.'))
+                        if 0.1 < v < 10000:
+                            print(f'  → Pattern trovato → €{v}')
+                            return v
+                    except ValueError:
+                        continue
 
         # Fallback BeautifulSoup
         soup = BeautifulSoup(text, 'lxml')
@@ -211,12 +218,11 @@ def get_aliexpress_price(url):
             '.product-price-value',
             'span[class*="Price_price"]',
             'div[class*="price--"]',
-            'span[class*="price"]',
         ]:
             el = soup.select_one(sel)
             if el:
                 price = parse_price(el.get_text())
-                if price and price > 0:
+                if price and 0.1 < price < 10000:
                     return price
 
         print('  ⚠️  AliExpress: prezzo non trovato')
